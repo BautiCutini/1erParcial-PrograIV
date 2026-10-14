@@ -63,5 +63,19 @@ describe('PedidoService', () => {
       expect(() => service.crearPedido({ productoId: expreso.id, cantidad: 0 })).toThrow(ValidacionError);
       expect(() => service.crearPedido({ productoId: expreso.id, cantidad: -2 })).toThrow(ValidacionError);
     });
+
+    it('falla si la cantidad no es un entero', () => {
+      const service = new PedidoService(buscar);
+
+      expect(() => service.crearPedido({ productoId: expreso.id, cantidad: 1.5 })).toThrow(ValidacionError);
+      expect(() => service.crearPedido({ productoId: expreso.id, cantidad: '2' })).toThrow(ValidacionError);
+    });
+
+    it('falla si faltan campos obligatorios', () => {
+      const service = new PedidoService(buscar);
+
+      expect(() => service.crearPedido({ productoId: undefined, cantidad: 1 })).toThrow(ValidacionError);
+      expect(() => service.crearPedido({ productoId: expreso.id, cantidad: undefined })).toThrow(ValidacionError);
+    });
   });
 });
