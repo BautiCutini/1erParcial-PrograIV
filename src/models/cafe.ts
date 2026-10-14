@@ -1,4 +1,5 @@
 import {Producto} from './producto';
+import {generarId} from '../utils/generar-id';
 
 export type Variedad = 'Brasil' | 'Colombia' | 'Etiopia' ;
 export type Tamano = 'pocillo' | 'mediano' | 'taza grande' ;
@@ -19,9 +20,7 @@ export abstract class Cafe extends Producto {
         super();
     }
     get id(): string {
-        return `${this.nombre}-${this.tamano}-${this.variedad}`
-       .toLowerCase()
-       .replaceAll(' ', '-');
+        return generarId(this.nombre, this.tamano, this.variedad);
     }
 
     calcularPrecio(): number {

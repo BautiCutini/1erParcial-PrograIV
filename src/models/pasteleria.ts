@@ -1,4 +1,5 @@
 import {Producto} from './producto';
+import {generarId} from '../utils/generar-id';
 
 export class Pasteleria extends Producto {
     constructor(
@@ -8,7 +9,7 @@ export class Pasteleria extends Producto {
         super();
     }
     get id(): string {
-        return this.nombre.toLowerCase().replaceAll(' ', '-');
+        return generarId(this.nombre);
     }
 
     calcularPrecio(): number {
