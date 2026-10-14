@@ -23,4 +23,21 @@ describe('PedidoService', () => {
     expect(a.id).toBe(1);
     expect(b.id).toBe(2);
   });
+
+  describe('listarPedidos', () => {
+    it('devuelve una lista vacía si no hay pedidos', () => {
+      const service = new PedidoService(buscar);
+
+      expect(service.listarPedidos()).toEqual([]);
+    });
+
+    it('devuelve todos los pedidos creados', () => {
+      const service = new PedidoService(buscar);
+
+      service.crearPedido({ productoId: expreso.id, cantidad: 1 });
+      service.crearPedido({ productoId: expreso.id, cantidad: 2 });
+
+      expect(service.listarPedidos()).toHaveLength(2);
+    });
+  });
 });
