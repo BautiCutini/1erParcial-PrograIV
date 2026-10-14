@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PedidoService } from '../../src/models/pedido';
+import { PedidoService, PedidoNoEncontradoError } from '../../src/models/pedido';
 import { Expreso } from '../../src/models/expreso';
 
 const expreso = new Expreso('Brasil', 'pocillo'); // 5020
@@ -48,5 +48,11 @@ describe('PedidoService', () => {
 
       expect(service.obtenerPedido(creado.id)).toEqual(creado);
     });
-      });
+
+    it('lanza PedidoNoEncontradoError si no existe', () => {
+      const service = new PedidoService(buscar);
+
+      expect(() => service.obtenerPedido(123)).toThrow(PedidoNoEncontradoError);
+    });
+  });
 });
