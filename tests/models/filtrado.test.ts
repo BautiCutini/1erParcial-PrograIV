@@ -9,4 +9,12 @@ describe('Filtrado', () => {
     const precio = filtrado.calcularPrecio();
     expect(precio).toBe(4040);
   });
+
+  it('tiene id y nombre', () => {
+  const filtrado = new Filtrado('Colombia', 'mediano');
+
+  expect(filtrado.id).toBe('filtrado-mediano-colombia');
+  expect(filtrado.nombre).toBe('Filtrado');
+  });
+
 });
