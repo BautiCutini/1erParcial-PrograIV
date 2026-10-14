@@ -18,6 +18,7 @@ export class Pedido {
 
 export class PedidoService {
   private readonly buscarProducto: BuscarProducto;
+  private pedidos: Pedido[] = [];
   private siguienteId = 1;
 
   constructor(buscarProducto: BuscarProducto) {
@@ -27,6 +28,12 @@ export class PedidoService {
   crearPedido(input: { productoId: string; cantidad: number }): Pedido {
     const producto = this.buscarProducto(input.productoId)!; // provisorio, se arregla en el ciclo 8
     const total = producto.calcularPrecio() * input.cantidad;
-    return new Pedido(this.siguienteId++, input.productoId, input.cantidad, total);
+    const pedido = new Pedido(this.siguienteId++, input.productoId, input.cantidad, total);
+    this.pedidos.push(pedido);
+    return pedido;
+  }
+
+  listarPedidos(): Pedido[] {
+    return [...this.pedidos];
   }
 }
