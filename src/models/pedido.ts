@@ -26,7 +26,7 @@ export class PedidoService {
   }
 
   crearPedido(input: { productoId: string; cantidad: number }): Pedido {
-    const producto = this.buscarProducto(input.productoId)!; // provisorio, se arregla en el ciclo 8
+    const producto = this.buscarProducto(input.productoId)!; 
     const total = producto.calcularPrecio() * input.cantidad;
     const pedido = new Pedido(this.siguienteId++, input.productoId, input.cantidad, total);
     this.pedidos.push(pedido);
@@ -35,5 +35,9 @@ export class PedidoService {
 
   listarPedidos(): Pedido[] {
     return [...this.pedidos];
+  }
+
+  obtenerPedido(id: number): Pedido {
+    return this.pedidos.find((p) => p.id === id)!; 
   }
 }
