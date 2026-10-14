@@ -2,6 +2,13 @@ import type { Producto } from './producto';
 
 export type BuscarProducto = (id: string) => Producto | undefined;
 
+export class ValidacionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ValidacionError';
+  }
+}
+
 export class PedidoNoEncontradoError extends Error {
   constructor(id: number) {
     super(`Pedido con id ${id} no encontrado`);
@@ -33,6 +40,10 @@ export class PedidoService {
   }
 
   crearPedido(input: { productoId: string; cantidad: number }): Pedido {
+    if (input.cantidad <= 0) {
+      throw new ValidacionError('cantidad debe ser mayor a 0');
+    }
+
     const producto = this.buscarProducto(input.productoId)!; // provisorio, se arregla en el ciclo 8
     const total = producto.calcularPrecio() * input.cantidad;
     const pedido = new Pedido(this.siguienteId++, input.productoId, input.cantidad, total);
