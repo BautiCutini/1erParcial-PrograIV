@@ -47,7 +47,11 @@ export class PedidoService {
   crearPedido(input: NuevoPedidoInput): Pedido {
     const { productoId, cantidad } = this.validar(input);
 
-    const producto = this.buscarProducto(productoId)!; // provisorio, se arregla en el ciclo 8
+    const producto = this.buscarProducto(productoId);
+    if (!producto) {
+      throw new ValidacionError(`El producto con id ${productoId} no existe`);
+    }
+
     const total = producto.calcularPrecio() * cantidad;
     const pedido = new Pedido(this.siguienteId++, productoId, cantidad, total);
     this.pedidos.push(pedido);
