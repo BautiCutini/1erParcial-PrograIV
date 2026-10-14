@@ -13,4 +13,14 @@ describe('PedidoService', () => {
 
     expect(pedido.total).toBe(15060);
   });
+
+  it('asigna ids incrementales', () => {
+    const service = new PedidoService(buscar);
+
+    const a = service.crearPedido({ productoId: expreso.id, cantidad: 1 });
+    const b = service.crearPedido({ productoId: expreso.id, cantidad: 1 });
+
+    expect(a.id).toBe(1);
+    expect(b.id).toBe(2);
+  });
 });
