@@ -30,6 +30,11 @@ export class Pedido {
   }
 }
 
+export interface NuevoPedidoInput {
+  productoId: unknown;
+  cantidad: unknown;
+}
+
 export class PedidoService {
   private readonly buscarProducto: BuscarProducto;
   private pedidos: Pedido[] = [];
@@ -39,14 +44,12 @@ export class PedidoService {
     this.buscarProducto = buscarProducto;
   }
 
-  crearPedido(input: { productoId: string; cantidad: number }): Pedido {
-    if (input.cantidad <= 0) {
-      throw new ValidacionError('cantidad debe ser mayor a 0');
-    }
+  crearPedido(input: NuevoPedidoInput): Pedido {
+    const { productoId, cantidad } = this.validar(input);
 
-    const producto = this.buscarProducto(input.productoId)!; // provisorio, se arregla en el ciclo 8
-    const total = producto.calcularPrecio() * input.cantidad;
-    const pedido = new Pedido(this.siguienteId++, input.productoId, input.cantidad, total);
+    const producto = this.buscarProducto(productoId)!; // provisorio, se arregla en el ciclo 8
+    const total = producto.calcularPrecio() * cantidad;
+    const pedido = new Pedido(this.siguienteId++, productoId, cantidad, total);
     this.pedidos.push(pedido);
     return pedido;
   }
@@ -61,5 +64,27 @@ export class PedidoService {
       throw new PedidoNoEncontradoError(id);
     }
     return pedido;
+  }
+
+  private validar(input: NuevoPedidoInput): { productoId: string; cantidad: number } {
+    const { productoId, cantidad } = input;
+
+    if (productoId === undefined || productoId === null) {
+      throw new ValidacionError('productoId es obligatorio');
+    }
+    if (cantidad === undefined || cantidad === null) {
+      throw new ValidacionError('cantidad es obligatoria');
+    }
+    if (typeof productoId !== 'string') {
+      throw new ValidacionError('productoId debe ser un texto');
+    }
+    if (typeof cantidad !== 'number' || !Number.isInteger(cantidad)) {
+      throw new ValidacionError('cantidad debe ser un número entero');
+    }
+    if (cantidad <= 0) {
+      throw new ValidacionError('cantidad debe ser mayor a 0');
+    }
+
+    return { productoId, cantidad };
   }
 }
