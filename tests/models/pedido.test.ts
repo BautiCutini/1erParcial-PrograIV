@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { PedidoService, PedidoNoEncontradoError, ValidacionError } from '../../src/models/pedido';
 import { Expreso } from '../../src/models/expreso';
 
-const expreso = new Expreso('Brasil', 'pocillo'); // 5020
+const expreso = new Expreso('Brasil', 'pocillo'); 
 const buscar = (id: string) => (id === expreso.id ? expreso : undefined);
 
 describe('PedidoService', () => {
@@ -76,6 +76,24 @@ describe('PedidoService', () => {
 
       expect(() => service.crearPedido({ productoId: undefined, cantidad: 1 })).toThrow(ValidacionError);
       expect(() => service.crearPedido({ productoId: expreso.id, cantidad: undefined })).toThrow(ValidacionError);
+    });
+
+    it('falla si el producto no existe', () => {
+      const service = new PedidoService(buscar);
+
+      expect(() => service.crearPedido({ productoId: 'producto-inexistente', cantidad: 1 })).toThrow(ValidacionError);
+    });
+
+    it('no guarda el pedido si la validación falla', () => {
+      const service = new PedidoService(buscar);
+
+      try {
+        service.crearPedido({ productoId: expreso.id, cantidad: 0 });
+      } catch {
+       
+      }
+
+      expect(service.listarPedidos()).toHaveLength(0);
     });
   });
 });
