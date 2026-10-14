@@ -40,4 +40,13 @@ describe('PedidoService', () => {
       expect(service.listarPedidos()).toHaveLength(2);
     });
   });
+
+  describe('obtenerPedido', () => {
+    it('devuelve el pedido por id', () => {
+      const service = new PedidoService(buscar);
+      const creado = service.crearPedido({ productoId: expreso.id, cantidad: 4 });
+
+      expect(service.obtenerPedido(creado.id)).toEqual(creado);
+    });
+      });
 });
