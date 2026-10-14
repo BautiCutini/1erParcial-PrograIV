@@ -1,4 +1,4 @@
-export type Variedad = 'Brasil' | 'Colombia' | 'Etiopía' ;
+export type Variedad = 'Brasil' | 'Colombia' | 'Etiopia' ;
 export type Tamano = 'pocillo' | 'mediano' | 'taza grande' ;
 
 const PRECIO_POR_GRAMO: Record<Variedad, number> = {
