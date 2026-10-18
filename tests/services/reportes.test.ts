@@ -32,8 +32,8 @@ describe('ReportesService', () => {
     });
 
     it('calcula la facturación total y cantidad de pedidos', () => {
-    pedidos.crearPedido({ productoId: muffin.id, cantidad: 2 });
-    pedidos.crearPedido({ productoId: torta.id, cantidad: 1 });
+    pedidos.crearPedido({ items: [{ productoId: muffin.id, cantidad: 2 }] });
+    pedidos.crearPedido({ items: [{ productoId: torta.id, cantidad: 1 }] });
 
     expect(reportes.obtenerFacturacion()).toEqual({
         facturacionTotal: 9200,
@@ -42,9 +42,9 @@ describe('ReportesService', () => {
     });
 
     it('acumula las cantidades y facturación por producto', () => {
-    pedidos.crearPedido({ productoId: muffin.id, cantidad: 2 });
-    pedidos.crearPedido({ productoId: muffin.id, cantidad: 3 });
-    pedidos.crearPedido({ productoId: torta.id, cantidad: 1 });
+    pedidos.crearPedido({ items: [{ productoId: muffin.id, cantidad: 2 }] });
+    pedidos.crearPedido({ items: [{ productoId: muffin.id, cantidad: 3 }] });
+    pedidos.crearPedido({ items: [{ productoId: torta.id, cantidad: 1 }] });
 
     const resultado = reportes.obtenerReporteProductos();
 
@@ -64,8 +64,8 @@ describe('ReportesService', () => {
     });
 
     it('identifica el producto más vendido por unidades', () => {
-    pedidos.crearPedido({ productoId: muffin.id, cantidad: 2 });
-    pedidos.crearPedido({ productoId: torta.id, cantidad: 3 });
+    pedidos.crearPedido({ items: [{ productoId: muffin.id, cantidad: 2 }] });
+    pedidos.crearPedido({ items: [{ productoId: torta.id, cantidad: 3 }] });
 
     expect(reportes.obtenerReporteProductos().masVendido).toEqual({
         productoId: torta.id,

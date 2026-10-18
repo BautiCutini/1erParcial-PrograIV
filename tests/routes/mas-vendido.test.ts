@@ -29,8 +29,8 @@ describe('GET /reportes/mas-vendido', () => {
 
   it('devuelve el producto con más unidades vendidas', async () => {
     const app = crearApp();
-    await request(app).post('/pedidos').send({ productoId: 'expreso-pocillo-brasil', cantidad: 2 });
-    await request(app).post('/pedidos').send({ productoId: 'muffin-de-chocolate', cantidad: 5 });
+    await request(app).post('/pedidos').send({ items: [{ productoId: 'expreso-pocillo-brasil', cantidad: 2 }] });
+    await request(app).post('/pedidos').send({ items: [{ productoId: 'muffin-de-chocolate', cantidad: 5 }] });
 
     const res = await request(app).get('/reportes/mas-vendido');
 
