@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
-import express from 'express';
-import { crearPedidosRouter } from '../../src/routes/pedidos.routes';
-import { PedidoService } from '../../src/models/pedido';
+import express, { type NextFunction, type Request, type Response } from 'express';
+import { crearPedidosRouter } from '../../src/routes/pedidos';
+import { PedidoService, ValidacionError, PedidoNoEncontradoError } from '../../src/models/pedido';
 import { Producto } from '../../src/models/producto';
 
 class ProductoTest extends Producto {
@@ -32,6 +32,20 @@ function crearApp() {
   const app = express();
   app.use(express.json());
   app.use('/pedidos', crearPedidosRouter(pedidoService));
+
+  // Mismo manejo de errores que app.ts
+  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+    if (err instanceof ValidacionError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    if (err instanceof PedidoNoEncontradoError) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.status(500).json({ error: 'Error interno del servidor' });
+  });
+
   return app;
 }
 
