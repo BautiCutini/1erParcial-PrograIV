@@ -41,10 +41,12 @@ export class ReportesService {
     }
     
     for (const pedido of this.pedidos.listarPedidos()) {
-        const reporte = acumulado.get(pedido.productoId);
-        if (!reporte) continue;
-        reporte.cantidadVendida += pedido.cantidad;
-        reporte.facturacion += pedido.total;
+        for (const item of pedido.items) {
+            const reporte = acumulado.get(item.productoId);
+            if (!reporte) continue;
+            reporte.cantidadVendida += item.cantidad;
+            reporte.facturacion += item.subtotal;
+        }
     }
     
     const cantidadPorProducto = [...acumulado.values()].sort((a, b) =>
