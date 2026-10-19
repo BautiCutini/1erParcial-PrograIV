@@ -18,7 +18,6 @@ export class PedidoNoEncontradoError extends Error {
   }
 }
 
-/** Una línea del pedido. El subtotal queda guardado con el precio del momento de la compra. */
 export interface ItemPedido {
   readonly productoId: string;
   readonly cantidad: number;
