@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
-import express from 'express';
-import { crearPedidosRouter } from '../../src/routes/pedidos.routes';
-import { PedidoService } from '../../src/models/pedido';
+import express, { type NextFunction, type Request, type Response } from 'express';
+import { crearPedidosRouter } from '../../src/routes/pedidos';
+import { PedidoService, ValidacionError, PedidoNoEncontradoError } from '../../src/models/pedido';
 import { Producto } from '../../src/models/producto';
 
 class ProductoTest extends Producto {
@@ -23,68 +23,107 @@ class ProductoTest extends Producto {
 }
 
 const PRODUCTO_MOCK = new ProductoTest('cafe-001', 'Café Express', 150);
-
+const TORTA_MOCK = new ProductoTest('torta-001', 'Torta', 400);
+const PRODUCTOS_MOCK = [PRODUCTO_MOCK, TORTA_MOCK];
 
 function crearApp() {
-  const buscarProducto = (id: string) =>
-    id === PRODUCTO_MOCK.id ? PRODUCTO_MOCK : undefined;
+  const buscarProducto = (id: string) => PRODUCTOS_MOCK.find((p) => p.id === id);
   const pedidoService = new PedidoService(buscarProducto);
   const app = express();
   app.use(express.json());
   app.use('/pedidos', crearPedidosRouter(pedidoService));
+
+  // Mismo manejo de errores que app.ts
+  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+    if (err instanceof ValidacionError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    if (err instanceof PedidoNoEncontradoError) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    res.status(500).json({ error: 'Error interno del servidor' });
+  });
+
   return app;
 }
-
 
 describe('POST /pedidos', () => {
   it('devuelve 201 con el pedido creado y el total calculado', async () => {
     const res = await request(crearApp())
       .post('/pedidos')
-      .send({ productoId: 'cafe-001', cantidad: 3 });
+      .send({ items: [{ productoId: 'cafe-001', cantidad: 3 }] });
 
     expect(res.status).toBe(201);
-    expect(res.body.productoId).toBe('cafe-001');
-    expect(res.body.cantidad).toBe(3);
+    expect(res.body.items).toHaveLength(1);
+    expect(res.body.items[0].productoId).toBe('cafe-001');
+    expect(res.body.items[0].cantidad).toBe(3);
+    expect(res.body.estado).toBe('pendiente');
     expect(res.body.total).toBe(450); // 150 * 3
     expect(res.body.id).toBeDefined();
   });
 
-  it('devuelve 400 si falta productoId', async () => {
+  it('suma el total de varios items', async () => {
     const res = await request(crearApp())
       .post('/pedidos')
-      .send({ cantidad: 2 });
+      .send({
+        items: [
+          { productoId: 'cafe-001', cantidad: 2 },
+          { productoId: 'torta-001', cantidad: 1 },
+        ],
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.items).toHaveLength(2);
+    expect(res.body.total).toBe(700); // 2 * 150 + 1 * 400
+  });
+
+  it('devuelve 400 si falta items', async () => {
+    const res = await request(crearApp()).post('/pedidos').send({});
     expect(res.status).toBe(400);
   });
 
-  it('devuelve 400 si falta cantidad', async () => {
+  it('devuelve 400 si items está vacío', async () => {
+    const res = await request(crearApp()).post('/pedidos').send({ items: [] });
+    expect(res.status).toBe(400);
+  });
+
+  it('devuelve 400 si a un item le falta productoId', async () => {
     const res = await request(crearApp())
       .post('/pedidos')
-      .send({ productoId: 'cafe-001' });
+      .send({ items: [{ cantidad: 2 }] });
+    expect(res.status).toBe(400);
+  });
+
+  it('devuelve 400 si a un item le falta cantidad', async () => {
+    const res = await request(crearApp())
+      .post('/pedidos')
+      .send({ items: [{ productoId: 'cafe-001' }] });
     expect(res.status).toBe(400);
   });
 
   it('devuelve 400 si el producto no existe', async () => {
     const res = await request(crearApp())
       .post('/pedidos')
-      .send({ productoId: 'no-existe', cantidad: 1 });
+      .send({ items: [{ productoId: 'no-existe', cantidad: 1 }] });
     expect(res.status).toBe(400);
   });
 
   it('devuelve 400 si cantidad es 0 o negativa', async () => {
     const res = await request(crearApp())
       .post('/pedidos')
-      .send({ productoId: 'cafe-001', cantidad: 0 });
+      .send({ items: [{ productoId: 'cafe-001', cantidad: 0 }] });
     expect(res.status).toBe(400);
   });
 
   it('devuelve 400 si cantidad no es un entero', async () => {
     const res = await request(crearApp())
       .post('/pedidos')
-      .send({ productoId: 'cafe-001', cantidad: 1.5 });
+      .send({ items: [{ productoId: 'cafe-001', cantidad: 1.5 }] });
     expect(res.status).toBe(400);
   });
 });
-
 
 describe('GET /pedidos', () => {
   it('devuelve 200 con lista vacía si no hay pedidos', async () => {
@@ -95,8 +134,8 @@ describe('GET /pedidos', () => {
 
   it('devuelve 200 con todos los pedidos creados', async () => {
     const app = crearApp();
-    await request(app).post('/pedidos').send({ productoId: 'cafe-001', cantidad: 1 });
-    await request(app).post('/pedidos').send({ productoId: 'cafe-001', cantidad: 2 });
+    await request(app).post('/pedidos').send({ items: [{ productoId: 'cafe-001', cantidad: 1 }] });
+    await request(app).post('/pedidos').send({ items: [{ productoId: 'cafe-001', cantidad: 2 }] });
 
     const res = await request(app).get('/pedidos');
     expect(res.status).toBe(200);
@@ -104,13 +143,12 @@ describe('GET /pedidos', () => {
   });
 });
 
-
 describe('GET /pedidos/:id', () => {
   it('devuelve 200 con el pedido si existe', async () => {
     const app = crearApp();
     const created = await request(app)
       .post('/pedidos')
-      .send({ productoId: 'cafe-001', cantidad: 2 });
+      .send({ items: [{ productoId: 'cafe-001', cantidad: 2 }] });
 
     const res = await request(app).get(`/pedidos/${created.body.id}`);
     expect(res.status).toBe(200);
