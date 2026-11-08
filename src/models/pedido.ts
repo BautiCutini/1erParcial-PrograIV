@@ -29,11 +29,18 @@ export class Pedido {
   readonly items: readonly ItemPedido[];
   readonly estado: EstadoPedido;
   readonly total: number;
+  readonly mesaId?: number;
 
-  constructor(id: number, items: readonly ItemPedido[], estado: EstadoPedido = 'pendiente') {
+  constructor(
+    id: number,
+    items: readonly ItemPedido[],
+    estado: EstadoPedido = 'pendiente',
+    mesaId?: number,
+  ) {
     this.id = id;
     this.items = items;
     this.estado = estado;
+    this.mesaId = mesaId;
     // El total es la suma de los subtotales: calcularPrecio() x cantidad de cada item.
     this.total = items.reduce((suma, item) => suma + item.subtotal, 0);
   }
@@ -41,6 +48,7 @@ export class Pedido {
 
 export interface NuevoPedidoInput {
   items: unknown;
+  mesaId?: unknown;
 }
 
 interface ItemValidado {
@@ -59,6 +67,7 @@ export class PedidoService {
 
   crearPedido(input: NuevoPedidoInput): Pedido {
     const itemsValidados = this.validar(input);
+    const mesaId = this.validarMesaId(input.mesaId);
 
     // Si cualquier item falla, se lanza el error antes de guardar nada.
     const items = itemsValidados.map(({ productoId, cantidad }, indice) => {
@@ -69,7 +78,7 @@ export class PedidoService {
       return { productoId, cantidad, subtotal: producto.calcularPrecio() * cantidad };
     });
 
-    const pedido = new Pedido(this.siguienteId++, items);
+    const pedido = new Pedido(this.siguienteId++, items, 'pendiente', mesaId);
     this.pedidos.push(pedido);
     return pedido;
   }
@@ -84,6 +93,21 @@ export class PedidoService {
       throw new PedidoNoEncontradoError(id);
     }
     return pedido;
+  }
+
+  // mesaId es opcional: si falta (o viene null) no se valida nada.
+  // Si viene, tiene que ser un número entero mayor a 0.
+  private validarMesaId(mesaId: unknown): number | undefined {
+    if (mesaId === undefined || mesaId === null) {
+      return undefined;
+    }
+    if (typeof mesaId !== 'number' || !Number.isInteger(mesaId)) {
+      throw new ValidacionError('mesaId debe ser un número entero');
+    }
+    if (mesaId <= 0) {
+      throw new ValidacionError('mesaId debe ser mayor a 0');
+    }
+    return mesaId;
   }
 
   private validar(input: NuevoPedidoInput): ItemValidado[] {
