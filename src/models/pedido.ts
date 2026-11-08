@@ -41,7 +41,7 @@ export class Pedido {
     this.items = items;
     this.estado = estado;
     this.mesaId = mesaId;
-    // El total es la suma de los subtotales: calcularPrecio() x cantidad de cada item.
+   
     this.total = items.reduce((suma, item) => suma + item.subtotal, 0);
   }
 }
@@ -95,8 +95,13 @@ export class PedidoService {
     return pedido;
   }
 
-  // mesaId es opcional: si falta (o viene null) no se valida nada.
-  // Si viene, tiene que ser un número entero mayor a 0.
+
+  reiniciar(): void {
+    this.pedidos = [];
+    this.siguienteId = 1;
+  }
+
+  
   private validarMesaId(mesaId: unknown): number | undefined {
     if (mesaId === undefined || mesaId === null) {
       return undefined;
