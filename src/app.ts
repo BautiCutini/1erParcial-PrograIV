@@ -5,6 +5,7 @@ import { PedidoService, ValidacionError, PedidoNoEncontradoError } from './model
 import { crearProductosRouter } from './routes/productos';
 import { crearPedidosRouter } from './routes/pedidos';
 import { crearReportesRouter } from './routes/reportes';
+import { crearTestRouter } from './routes/test';
 import { ReportesService } from './services/reportes';
 
 const app = express();
@@ -17,6 +18,11 @@ const reportesService = new ReportesService(catalogo, pedidoService);
 app.use('/productos', crearProductosRouter(catalogo));
 app.use('/pedidos', crearPedidosRouter(pedidoService));
 app.use('/reportes', crearReportesRouter(reportesService));
+
+// Endpoints de apoyo para tests: nunca en producción.
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/_test', crearTestRouter(pedidoService));
+}
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof ValidacionError) {
