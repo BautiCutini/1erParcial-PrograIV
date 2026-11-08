@@ -41,3 +41,16 @@ describe('PedidoService - mesaId opcional', () => {
     expect(service.listarPedidos()).toHaveLength(0);
   });
 });
+
+describe('PedidoService.reiniciar', () => {
+  it('borra los pedidos y vuelve a numerar desde 1', () => {
+    const service = crearService();
+    service.crearPedido({ items: ITEMS });
+    service.crearPedido({ items: ITEMS });
+
+    service.reiniciar();
+
+    expect(service.listarPedidos()).toEqual([]);
+    expect(service.crearPedido({ items: ITEMS }).id).toBe(1);
+  });
+});
