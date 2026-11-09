@@ -1,12 +1,12 @@
 import { useMenu } from '../hooks/useMenu';
+import type { Producto } from '../schemas/producto';
+import { SeleccionProductos } from './SeleccionProductos';
 
-const formatoPrecio = new Intl.NumberFormat('es-AR', {
-  style: 'currency',
-  currency: 'ARS',
-  maximumFractionDigits: 0,
-});
+type Props = {
+  onAgregar?: (producto: Producto) => void;
+};
 
-export function Menu() {
+export function Menu({ onAgregar = () => {} }: Props) {
   const menu = useMenu();
 
   if (menu.estado === 'cargando') {
@@ -30,17 +30,5 @@ export function Menu() {
     );
   }
 
-  return (
-    <ul className="list-group">
-      {menu.productos.map((p) => (
-        <li key={p.id} className="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            {p.nombre}
-            <small className="text-muted d-block">{p.id}</small>
-          </div>
-          <span className="fw-semibold">{formatoPrecio.format(p.precio)}</span>
-        </li>
-      ))}
-    </ul>
-  );
+  return <SeleccionProductos productos={menu.productos} onAgregar={onAgregar} />;
 }
