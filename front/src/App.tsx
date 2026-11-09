@@ -2,14 +2,28 @@ import { Menu } from './components/Menu';
 
 export default function App() {
   return (
-    <div className="container py-3">
-      <header className="mb-4">
-        <h1 className="h3 mb-0">Cafetería Origen</h1>
+    <>
+      <header className="encabezado py-4 mb-4 shadow-sm">
+        <div className="container">
+          <h1 className="h2 mb-1">Cafetería Origen</h1>
+          <p className="encabezado__subtitulo mb-0">Café de especialidad · Pedí desde tu mesa</p>
+        </div>
       </header>
-      <main>
-        {/* Cuando exista el carrito, se conecta acá: <Menu onAgregar={agregarAlCarrito} /> */}
-        <Menu />
+
+      <main className="container flex-grow-1 mb-4">
+        <section className="card border-0 shadow-sm">
+          <div className="card-body p-3 p-md-4">
+            {/* Cuando exista el carrito, se conecta acá: <Menu onAgregar={agregarAlCarrito} /> */}
+            <Menu />
+          </div>
+        </section>
       </main>
-    </div>
+
+      <footer className="pie py-3 mt-auto">
+        <div className="container text-center small">
+          <p className="mb-0">Cafetería Origen · Colombia, Etiopía y Brasil en tu taza</p>
+        </div>
+      </footer>
+    </>
   );
 }
