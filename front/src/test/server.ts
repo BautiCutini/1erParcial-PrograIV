@@ -1,10 +1,8 @@
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
+import { cafeBrasilPocillo, muffinChocolate } from './fixtures';
 
-export const productosMock = [
-  { id: 'expreso-pocillo-brasil', nombre: 'Expreso', precio: 5020 },
-  { id: 'muffin-de-chocolate', nombre: 'Muffin de chocolate', precio: 2500 },
-];
+export const productosMock = [cafeBrasilPocillo, muffinChocolate];
 
 export const server = setupServer(
   http.get('*/productos', () => HttpResponse.json(productosMock)),
