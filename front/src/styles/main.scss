@@ -1,3 +1,47 @@
+// Colores de la Cafetería Origen.
+// Se definen ANTES de cargar Bootstrap y se le pasan con `with (...)`,
+// así Bootstrap los usa en lugar de los suyos.
+$cafe-oscuro: #3b2a1f;
+$cafe-tostado: #6f4e37;
+$canela: #c58940;
+$crema: #f6efe6;
+
 @use 'bootstrap/scss/bootstrap' with (
-  $primary: #6f4e37
+  $primary: $cafe-tostado,
+  $secondary: $canela,
+  $dark: $cafe-oscuro,
+  $body-bg: $crema,
+  $body-color: $cafe-oscuro,
+  $font-family-sans-serif: ('Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif),
+  $headings-font-family: ('Playfair Display', Georgia, serif),
+  $border-radius: 0.75rem,
+  $border-radius-lg: 1rem
 );
+
+// La página ocupa todo el alto, así el footer queda abajo aunque haya poco contenido.
+body {
+  overflow-x: hidden; // nada de scroll horizontal en el celular
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.encabezado {
+  background: linear-gradient(135deg, $cafe-oscuro, $cafe-tostado);
+  color: $crema;
+}
+
+.encabezado__subtitulo {
+  color: rgba($crema, 0.75);
+}
+
+.pie {
+  background-color: $cafe-oscuro;
+  color: rgba($crema, 0.8);
+}
