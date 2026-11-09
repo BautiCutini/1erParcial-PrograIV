@@ -3,7 +3,7 @@ import type { Catalogo } from '../models/catalogo';
 import type { Producto } from '../models/producto';
 
 
-const aDto = (p: Producto) => ({ id: p.id, nombre: p.nombre, precio: p.calcularPrecio() });
+const aDto = (p: Producto) => ({ id: p.id,tipo:p.tipo, nombre: p.nombre, precio: p.calcularPrecio() });
 
 export function crearProductosRouter(catalogo: Catalogo): Router {
   const router = Router();
