@@ -1,6 +1,7 @@
 import {Cafe, Tamano } from './cafe';
 
 export class Expreso extends Cafe {
+    readonly tipo = 'expreso';
     readonly nombre = 'Expreso';
     readonly precioBase = 2500;
 

@@ -3,10 +3,11 @@ import request from 'supertest';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { crearPedidosRouter } from '../../src/routes/pedidos';
 import { PedidoService, ValidacionError, PedidoNoEncontradoError } from '../../src/models/pedido';
-import { Producto } from '../../src/models/producto';
+import { Producto, type TipoProducto} from '../../src/models/producto';
 
 class ProductoTest extends Producto {
   readonly id: string;
+  readonly tipo: TipoProducto = 'pasteleria';
   readonly nombre: string;
   readonly precioBase: number;
 
