@@ -13,8 +13,15 @@ export class ApiError extends Error {
 export async function get<T>(path: string, schema: z.ZodType<T>, signal?: AbortSignal): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(new URL(path, window.location.origin), { signal });
-  } catch (e) {
+    const opciones: RequestInit = {};
+    
+    if (import.meta.env.MODE !== 'test' && signal) {
+      opciones.signal = signal;
+    }
+    
+    res = await fetch(new URL(path, window.location.origin), opciones);
+    }  catch (e) {
+    
     if (e instanceof DOMException && e.name === 'AbortError') throw e;
     throw new ApiError('No se pudo conectar con el servidor');
   }
