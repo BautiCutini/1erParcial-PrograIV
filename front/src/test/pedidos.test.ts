@@ -1,7 +1,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { http, HttpResponse } from 'msw';
-
+import { obtenerPedido } from '../api/pedidos';
 import { crearPedido } from '../api/pedidos';
 import { server } from './server';
 
@@ -48,4 +48,32 @@ describe('crearPedido', () => {
         expect(bodyRecibido).toEqual(pedidoNuevo);
         expect(resultado).toEqual(respuestaPedido);
     });
+
+describe('obtenerPedido', () => {
+    it('consulta un pedido por su ID y devuelve sus datos', async () => {
+        const respuestaPedido = {
+            id: 1,
+            mesaId: 5,
+            items: [
+                {
+                    productoId: 'muffin-de-chocolate',
+                    cantidad: 2,
+                    subtotal: 5000,
+                },
+            ],
+            estado: 'pendiente',
+            total: 5000,
+        };
+        
+        server.use(
+            http.get('*/pedidos/1', () => {
+                return HttpResponse.json(respuestaPedido);
+            }),
+        );
+        
+        const resultado = await obtenerPedido(1);
+        
+        expect(resultado).toEqual(respuestaPedido);
+    });
+});
 });
