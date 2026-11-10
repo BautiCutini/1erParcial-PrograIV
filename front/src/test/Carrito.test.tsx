@@ -204,5 +204,58 @@ describe('Carrito', () => {
         expect(
             screen.getByText('Muffin de chocolate'),
         ).toBeInTheDocument();
+    
+
+it('envía el número de mesa al confirmar el pedido', async () => {
+    const user = userEvent.setup();
+    let bodyRecibido: unknown;
+
+    server.use(
+        http.post('*/pedidos', async ({ request }) => {
+            bodyRecibido = await request.json();
+
+            return HttpResponse.json({
+                id: 1,
+                mesaId: 5,
+                items: [
+                    {
+                        productoId: muffinChocolate.id,
+                        cantidad: 1,
+                        subtotal: 2500,
+                    },
+                ],
+                estado: 'pendiente',
+                total: 2500,
+            }, { status: 201 });
+        }),
+    );
+
+    renderCarrito();
+
+    await user.click(
+        screen.getByRole('button', { name: 'Agregar muffin' }),
+    );
+
+    await user.type(
+        screen.getByLabelText(/número de mesa/i),
+        '5',
+    );
+
+    await user.click(
+        screen.getByRole('button', { name: /confirmar pedido/i }),
+    );
+
+    expect(bodyRecibido).toEqual({
+        mesaId: 5,
+        items: [
+            {
+                productoId: muffinChocolate.id,
+                cantidad: 1,
+            },
+        ],
+    });
+});
+
+
     });
 });
