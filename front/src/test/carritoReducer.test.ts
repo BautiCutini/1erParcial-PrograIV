@@ -34,9 +34,9 @@ describe('carritoReducer', () => {
             { type: 'AGREGAR', producto: tortaSelvaNegra },
         );
         
-    expect(resultado).toHaveLength(2);
+        expect(resultado).toHaveLength(2);
     });
-        
+    
     it('incrementa la cantidad de un producto', () => {
         const inicial = [
             { producto: muffinChocolate, cantidad: 1 },
@@ -47,9 +47,9 @@ describe('carritoReducer', () => {
             productoId: muffinChocolate.id,
         });
         
-    expect(resultado[0].cantidad).toBe(2);
+        expect(resultado[0].cantidad).toBe(2);
     });
-        
+    
     it('decrementa la cantidad de un producto', () => {
         const inicial = [
             { producto: muffinChocolate, cantidad: 2 },
@@ -60,9 +60,9 @@ describe('carritoReducer', () => {
             productoId: muffinChocolate.id,
         });
         
-    expect(resultado[0].cantidad).toBe(1);
+        expect(resultado[0].cantidad).toBe(1);
     });
-        
+    
     it('elimina el producto cuando la cantidad llega a cero', () => {
         const inicial = [
             { producto: muffinChocolate, cantidad: 1 },
@@ -73,9 +73,9 @@ describe('carritoReducer', () => {
             productoId: muffinChocolate.id,
         });
         
-    expect(resultado).toHaveLength(0);
+        expect(resultado).toHaveLength(0);
     });
-        
+    
     it('permite quitar un producto directamente', () => {
         const inicial = [
             { producto: muffinChocolate, cantidad: 2 },
@@ -87,8 +87,8 @@ describe('carritoReducer', () => {
             productoId: muffinChocolate.id,
         });
         
-    expect(resultado).toHaveLength(1);
-    expect(resultado[0].producto.id).toBe(tortaSelvaNegra.id);
+        expect(resultado).toHaveLength(1);
+        expect(resultado[0].producto.id).toBe(tortaSelvaNegra.id);
     });
     
     it('no modifica el carrito original', () => {
@@ -96,11 +96,11 @@ describe('carritoReducer', () => {
             { producto: muffinChocolate, cantidad: 1 },
         ];
         
-    carritoReducer(inicial, {
+        carritoReducer(inicial, {
         type: 'INCREMENTAR',
         productoId: muffinChocolate.id,
-    });
-    
-    expect(inicial[0].cantidad).toBe(1);
+        });
+        
+        expect(inicial[0].cantidad).toBe(1);
     });
 });
