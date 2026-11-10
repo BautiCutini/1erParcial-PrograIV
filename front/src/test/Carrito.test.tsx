@@ -2,6 +2,8 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
+import { server } from './server';
 
 import { Carrito } from '../components/Carrito';
 import { CarritoProvider, useCarrito } from '../context/CarritoContext';
@@ -108,5 +110,99 @@ describe('Carrito', () => {
         
         
         expect(screen.getByText(/9\.200/)).toBeInTheDocument();
+    });
+    
+    
+    it('muestra el botón para confirmar el pedido', async () => {
+        const user = userEvent.setup();
+        renderCarrito();
+        
+        await user.click(
+            screen.getByRole('button', { name: 'Agregar muffin' }),
+        );
+        
+        expect(
+            screen.getByRole('button', { name: /confirmar pedido/i }),
+        ).toBeInTheDocument();
+    });
+
+    it('confirma el pedido y vacía el carrito cuando el servidor responde correctamente', async () => {
+        const user = userEvent.setup();
+        let bodyRecibido: unknown;
+        
+        server.use(
+            http.post('*/pedidos', async ({ request }) => {
+                bodyRecibido = await request.json();
+            
+            return HttpResponse.json({
+                id: 1,
+                items: [
+                    {
+                        productoId: muffinChocolate.id,
+                        cantidad: 1,
+                        subtotal: 2500,
+                    },
+                ],
+                estado: 'pendiente',
+                total: 2500,
+            }, { status: 201 });
+        }),
+    );
+    
+    renderCarrito();
+    
+    await user.click(
+        screen.getByRole('button', { name: 'Agregar muffin' }),
+    );
+    
+    await user.click(
+        screen.getByRole('button', { name: /confirmar pedido/i }),
+    );
+    
+    expect(
+        await screen.findByText(/pedido.*1/i),
+    ).toBeInTheDocument();
+    
+    expect(bodyRecibido).toEqual({
+        items: [
+            {
+                productoId: muffinChocolate.id,
+                cantidad: 1,
+            },
+        ],
+    });
+    
+    expect(screen.getByText(/carrito vacío/i)).toBeInTheDocument();
+    });
+    
+    it('conserva los productos cuando falla la confirmación', async () => {
+        const user = userEvent.setup();
+    
+        server.use(
+            http.post('*/pedidos', () => {
+                return HttpResponse.json(
+                    { error: 'Error del servidor' },
+                    { status: 500 },
+                );
+            }),
+        );
+        
+        renderCarrito();
+        
+        await user.click(
+            screen.getByRole('button', { name: 'Agregar muffin' }),
+        );
+        
+        await user.click(
+            screen.getByRole('button', { name: /confirmar pedido/i }),
+        );
+        
+        expect(
+            await screen.findByText(/error/i),
+        ).toBeInTheDocument();
+        
+        expect(
+            screen.getByText('Muffin de chocolate'),
+        ).toBeInTheDocument();
     });
 });
