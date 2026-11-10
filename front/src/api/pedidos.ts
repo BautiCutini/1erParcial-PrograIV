@@ -45,3 +45,19 @@ export async function crearPedido(pedido: NuevoPedido): Promise<Pedido> {
     
     return PedidoSchema.parse(json);
 }
+
+export async function obtenerPedido(id: number): Promise<Pedido> {
+    const respuesta = await fetch(
+        new URL(`/pedidos/${id}`, window.location.origin),
+    );
+    
+    if (!respuesta.ok) {
+        throw new Error(
+            `No se pudo obtener el pedido. Error ${respuesta.status}`,
+        );
+    }
+    
+    const json: unknown = await respuesta.json();
+    
+    return PedidoSchema.parse(json);
+}
