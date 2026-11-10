@@ -10,7 +10,7 @@ export function Carrito() {
     const [pedidoId, setPedidoId] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [cargando, setCargando] = useState(false);
-    
+    const [mesaId, setMesaId] = useState('');
     const total = items.reduce(
         (acumulado, item) =>
             acumulado + item.producto.precio * item.cantidad,
@@ -23,15 +23,17 @@ export function Carrito() {
         
         try {
             const pedido = await crearPedido({
+                mesaId: Number(mesaId),
                 items: items.map((item) => ({
-                    productoId: item.producto.id,
-                    cantidad: item.cantidad,
-                })),
+                productoId: item.producto.id,
+                cantidad: item.cantidad,
+            })),
             });
             
             setPedidoId(pedido.id);
             vaciar();
-        } catch {
+        } catch (error) {
+            console.error('Error al confirmar pedido:', error);
             setError('No se pudo confirmar el pedido. Intentá nuevamente.');
         } finally {
             setCargando(false);
@@ -102,11 +104,22 @@ export function Carrito() {
                     ))}
                     
                     <h3>Total: {formatearPrecio(total)}</h3>
+                    <div>
+                    <label htmlFor="mesaId">Número de mesa</label>
+                    <input
+                        id="mesaId"
+                        type="number"
+                        min="1"
+                        value={mesaId}
+                        onChange={(e) => setMesaId(e.target.value)}
+                        placeholder="Ingresá tu número de mesa"
+                    />
+                    </div>
                     
                     <button
                         type="button"
                         onClick={confirmarPedido}
-                        disabled={cargando}
+                        disabled={cargando || !mesaId || Number(mesaId) <= 0}
                     >
                         {cargando ? 'Confirmando...' : 'Confirmar pedido'}
                     </button>
