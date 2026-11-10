@@ -10,8 +10,8 @@ export type AccionCarrito =
     | { type: 'AGREGAR'; producto: Producto }
     | { type: 'INCREMENTAR'; productoId: string }
     | { type: 'DECREMENTAR'; productoId: string }
-    | { type: 'QUITAR'; productoId: string };
-    
+    | { type: 'QUITAR'; productoId: string }
+    | { type: 'VACIAR' };
     
 export const carritoInicial: ItemCarrito[] = [];
 export function carritoReducer(
@@ -58,5 +58,8 @@ export function carritoReducer(
             
         default:
             return estado;
+        
+        case 'VACIAR':
+            return [];
     }
 }

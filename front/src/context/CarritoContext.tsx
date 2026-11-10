@@ -20,6 +20,7 @@
         incrementar: (productoId: string) => void;
         decrementar: (productoId: string) => void;
         quitar: (productoId: string) => void;
+        vaciar: () => void;
     }
     
     // Contexto.
@@ -51,16 +52,20 @@
             dispatch({ type: 'QUITAR', productoId });
         };
         
+        const vaciar = () => {
+            dispatch({ type: 'VACIAR' });
+        };
+        
         return (
             <CarritoContext.Provider
-                value={{ items, agregar, incrementar, decrementar, quitar }}
+                value={{ items, agregar, incrementar, decrementar, quitar, vaciar }}
             >
             {children}
             </CarritoContext.Provider>
         );
     }
     
-    // Hook para consumir el contexto desde cualquier componente.
+    
     export function useCarrito(): CarritoContextType {
         const contexto = useContext(CarritoContext);
         
