@@ -48,7 +48,7 @@ describe('Carrito', () => {
         await user.click(screen.getByRole('button', { name: 'Agregar muffin' }));
         
         expect(screen.getByText('Muffin de chocolate')).toBeInTheDocument();
-        expect(screen.getByText(/2\.500/)).toBeInTheDocument();
+        expect(screen.getAllByText(/2\.500/)).toHaveLength(3);
     });
     
     it('permite incrementar la cantidad de un producto', async () => {
