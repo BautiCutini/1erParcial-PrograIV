@@ -58,4 +58,17 @@ describe('CarritoContext', () => {
         
         expect(result.current.items).toEqual([]);
     });
+    
+    it('permite vaciar todo el carrito', () => {
+        const { result } = renderHook(() => useCarrito(), {
+        wrapper: CarritoProvider,
+        });
+        
+        act(() => {
+            result.current.agregar(muffinChocolate);
+            result.current.vaciar();
+        });
+        
+        expect(result.current.items).toEqual([]);
+    });
 });
