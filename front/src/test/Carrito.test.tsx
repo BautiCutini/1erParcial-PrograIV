@@ -198,7 +198,7 @@ describe('Carrito', () => {
         );
         
         expect(
-            await screen.findByText(/error/i),
+        await screen.findByText(/no se pudo confirmar el pedido/i),
         ).toBeInTheDocument();
         
         expect(
